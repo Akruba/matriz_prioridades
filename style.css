@@ -1,0 +1,329 @@
+:root {
+    --primary-bg: #f4f7f6;
+    --secondary-bg: #ffffff;
+    --accent-color: #4a90e2; /* Azul suave */
+    --urgent-important-bg: #ffebee; /* Rojo muy pálido */
+    --important-not-urgent-bg: #e8f5e9; /* Verde muy pálido */
+    --urgent-not-important-bg: #fff3e0; /* Naranja muy pálido */
+    --not-urgent-not-important-bg: #eceff1; /* Gris azulado pálido */
+    --text-color: #333;
+    --heading-color: #1a535c; /* Verde azulado oscuro */
+    --border-color: #ccc;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --task-bg: #ffffff;
+    --task-hover-bg: #f0f0f0;
+    --button-bg: var(--accent-color);
+    --button-text: white;
+    --button-hover-bg: #357abd;
+    --delete-color: #e57373; /* Rojo suave */
+    --edit-color: #64b5f6;  /* Azul suave */
+}
+
+/* Reset básico y fuente global */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header, footer {
+    background-color: var(--heading-color);
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+}
+
+header h1 {
+    font-size: 1.5rem; /* Ajustado */
+    margin-bottom: 0.2em;
+    font-weight: 600;
+}
+
+header h2 {
+    font-size: 1.8rem; /* Ajustado */
+    color: #f1faee; /* Color más claro para el subtítulo */
+    font-weight: 400;
+}
+
+main {
+    flex-grow: 1;
+    padding: 20px;
+    max-width: 1600px; /* Aumentado ligeramente */
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Controles (Select, Botón, Instrucciones) */
+.controls {
+    background-color: var(--secondary-bg);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+label {
+    font-weight: 600;
+    color: var(--heading-color);
+}
+
+button, select {
+    font-family: inherit;
+    font-size: 0.95rem; /* Ajustado */
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select {
+    min-width: 200px;
+}
+
+button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+}
+
+button:hover {
+    background-color: var(--button-hover-bg);
+    box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+.instructions {
+    font-size: 0.9rem;
+    color: #555;
+    flex-basis: 100%; /* Ocupa toda la línea */
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Área de tareas (Bandeja y Matriz) */
+.task-area {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap; /* Permite que se apilen en pantallas pequeñas */
+}
+
+/* Bandeja de Entrada */
+#taskPoolContainer {
+    flex: 1; /* Ocupa espacio disponible */
+    min-width: 300px; /* Ancho mínimo */
+    background-color: var(--secondary-bg);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    border: 1px dashed var(--border-color);
+}
+
+#taskPoolContainer h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--heading-color);
+    font-size: 1.1rem;
+}
+
+.task-list {
+    min-height: 150px; /* Altura mínima para la zona de drop */
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #fafafa; /* Fondo ligeramente diferente */
+}
+
+/* Contenedor de la Matriz */
+.matrix-container {
+    flex: 2.5; /* Más ancho que la bandeja */
+    min-width: 400px; /* Ancho mínimo */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Etiquetas de Ejes (Experimental) */
+.axis-labels {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas */
+    text-align: center;
+    font-weight: 600;
+    color: var(--heading-color);
+    margin-bottom: 5px;
+    padding: 0 10px; /* Alineación con cuadrantes */
+}
+.axis-labels .importance-label {
+    grid-column: 1 / -1; /* Ocupa ambas columnas */
+    text-align: left;
+    transform: rotate(-90deg) translateX(-50%) translateY(-15px); /* Rotado y posicionado */
+    transform-origin: left bottom;
+    position: absolute; /* Ajustar posicionamiento según sea necesario */
+    /* NOTA: El posicionamiento absoluto puede requerir ajustes finos */
+     display: none; /* Ocultado temporalmente - requiere ajustes más complejos */
+}
+.axis-labels .urgency-label {
+   /* Estilos para Urgente / No Urgente */
+   padding-bottom: 5px;
+}
+
+
+/* Matriz / Cuadrícula */
+.container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, minmax(250px, auto)); /* Altura mínima, crecimiento automático */
+    gap: 15px; /* Espacio entre cuadrantes */
+    width: 100%; /* Ocupa el ancho del matrix-container */
+    border: none; /* Quitamos borde exterior, los cuadrantes tienen el suyo */
+}
+
+.quadrant {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+.quadrant h4 {
+    font-size: 1.1rem; /* Tamaño título cuadrante */
+    color: var(--heading-color);
+    margin-bottom: 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+    width: 100%;
+}
+
+/* Colores de fondo para cuadrantes */
+.quadrant.important-urgent { background-color: var(--urgent-important-bg); }
+.quadrant.important-not-urgent { background-color: var(--important-not-urgent-bg); }
+.quadrant.not-important-urgent { background-color: var(--urgent-not-important-bg); }
+.quadrant.not-important-not-urgent { background-color: var(--not-urgent-not-important-bg); }
+
+/* Estilo de las Tareas */
+.task {
+    background-color: var(--task-bg);
+    padding: 10px 12px;
+    margin: 8px 5px;
+    cursor: grab;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95rem; /* Tamaño texto tarea */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.task:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    background-color: var(--task-hover-bg);
+}
+
+.task span {
+    flex-grow: 1; /* Permite que el texto ocupe el espacio */
+    margin-right: 10px; /* Espacio antes de los botones */
+    word-break: break-word; /* Evita desbordamiento de texto largo */
+}
+
+.task-buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem; /* Tamaño iconos */
+    padding: 2px 4px;
+    margin-left: 5px;
+    line-height: 1; /* Ajusta la altura de línea */
+    color: #777; /* Color grisáceo por defecto */
+    transition: color 0.2s ease;
+}
+.task-buttons button.edit-btn:hover { color: var(--edit-color); }
+.task-buttons button.delete-btn:hover { color: var(--delete-color); }
+
+/* Estilos para Drag & Drop */
+.task.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.quadrant.over, .task-list.over {
+    background-color: rgba(74, 144, 226, 0.1); /* Resaltado azul suave */
+    border-style: dashed;
+}
+
+/* Footer */
+footer {
+    margin-top: 30px;
+    padding: 15px;
+    font-size: 0.9rem;
+}
+
+/* --- Media Queries para Responsividad --- */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 992px) {
+    .task-area {
+        flex-direction: column; /* Apila la bandeja y la matriz */
+    }
+    #taskPoolContainer, .matrix-container {
+        width: 100%; /* Ocupan todo el ancho */
+        flex: none; /* Resetea flex grow */
+    }
+     .container {
+        grid-template-rows: repeat(2, minmax(200px, auto)); /* Filas un poco más bajas */
+    }
+}
+
+/* Móviles */
+@media (max-width: 600px) {
+    header h1 { font-size: 1.3rem; }
+    header h2 { font-size: 1.5rem; }
+
+    .controls {
+        flex-direction: column;
+        align-items: stretch; /* Estira los elementos del control */
+    }
+    .control-group {
+        justify-content: space-between;
+    }
+     select, button#addTaskBtn {
+         width: 100%; /* Botones y select anchos */
+    }
+    .container {
+        grid-template-columns: 1fr; /* Una sola columna */
+        grid-template-rows: repeat(4, minmax(180px, auto)); /* 4 filas */
+    }
+    .quadrant h4 {
+        font-size: 1rem;
+    }
+    .task {
+        font-size: 0.9rem;
+    }
+    .axis-labels {
+        display: none; /* Ocultar etiquetas en móvil, ocupa mucho espacio */
+    }
+}
